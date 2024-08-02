@@ -16,6 +16,7 @@ class RecordListViewModel(
 ) : MviViewModel<RecordListUiState, RecordListViewModel.Action, RecordListViewModel.SideEffect>(savedStateHandle) {
 
     sealed interface Action : MviAction {
+        data object OnRetryClick : Action
         data class OnRecordClick(val id: String) : Action
     }
 
@@ -35,6 +36,7 @@ class RecordListViewModel(
 
     override fun handleAction(action: Action) {
         when (action) {
+            is Action.OnRetryClick -> fetchRecords()
             is Action.OnRecordClick -> sendSideEffect(SideEffect.NavigateToRecord(id = action.id))
         }
     }
