@@ -123,7 +123,9 @@ private fun RecordWithRelationsContent(
             ),
             onClick = { id ->
                 // TODO
-            }
+            },
+            onEditClick = {},
+            onDeleteClick = {},
         )
     }
 }

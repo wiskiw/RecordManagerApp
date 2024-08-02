@@ -7,7 +7,7 @@ class AndroidLogger : AppLogger {
         private const val COMMON_TAG = "SpaceApp"
     }
 
-    override fun logError(message: String, exception: Exception?) {
+    override fun logError(message: String, exception: Throwable?) {
         Log.e(COMMON_TAG, message, exception)
     }
 }

@@ -21,7 +21,7 @@ import org.koin.dsl.module
 
 val viewModelModule = module {
     viewModel { RecordViewModel(get(), get(), get()) }
-    viewModel { RecordListViewModel(get(), get()) }
+    viewModel { RecordListViewModel(get(), get(), get(), get()) }
     viewModel { EditRecordViewModel(get(), get(), get()) }
 }
 

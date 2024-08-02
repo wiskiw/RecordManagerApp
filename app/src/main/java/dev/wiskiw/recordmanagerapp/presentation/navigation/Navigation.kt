@@ -16,6 +16,10 @@ fun NavGraphBuilder.buildMainGraph(navController: NavController) = run {
                 val destination = AppNavDestination.EditRecord(id = null)
                 navController.navigate(destination)
             },
+            navigateToEditRecord = { recordId ->
+                val destination = AppNavDestination.EditRecord(id = recordId)
+                navController.navigate(destination)
+            },
             navigateToRecord = { recordId ->
                 val destination = AppNavDestination.Record(id = recordId)
                 navController.navigate(destination)

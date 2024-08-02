@@ -39,6 +39,7 @@ import org.koin.androidx.compose.koinViewModel
 fun RecordListScreen(
     viewModel: RecordListViewModel = koinViewModel(),
     navigateToCreateRecord: () -> Unit,
+    navigateToEditRecord: (String) -> Unit,
     navigateToRecord: (String) -> Unit,
 ) {
     ConsumeSideEffect(
@@ -46,6 +47,7 @@ fun RecordListScreen(
     ) { sideEffect: RecordListViewModel.SideEffect ->
         when (sideEffect) {
             RecordListViewModel.SideEffect.NavigateToCreateRecordScreen -> navigateToCreateRecord()
+            is RecordListViewModel.SideEffect.NavigateToEditRecordScreen -> navigateToEditRecord(sideEffect.id)
             is RecordListViewModel.SideEffect.NavigateToRecord -> navigateToRecord(sideEffect.id)
         }
     }
@@ -92,10 +94,9 @@ private fun Content(
                     vertical = MaterialTheme.size.three,
                     horizontal = MaterialTheme.size.one,
                 ),
-                onClick = { id ->
-                    val action = RecordListViewModel.Action.OnRecordClick(id)
-                    handleAction(action)
-                }
+                onClick = { id -> handleAction(RecordListViewModel.Action.OnRecordClick(id)) },
+                onEditClick = { id -> handleAction(RecordListViewModel.Action.OnEditClick(id)) },
+                onDeleteClick = { id -> handleAction(RecordListViewModel.Action.OnDeleteClick(id)) },
             )
         }
     }

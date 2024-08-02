@@ -2,6 +2,8 @@ package dev.wiskiw.recordmanagerapp.presentation.screen.recordlist
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import dev.wiskiw.recordmanagerapp.app.logger.AppLogger
+import dev.wiskiw.recordmanagerapp.domain.usecase.RecordUseCase
 import dev.wiskiw.recordmanagerapp.domain.usecase.SearchRecordUseCase
 import dev.wiskiw.recordmanagerapp.presentation.tool.mvi.MviAction
 import dev.wiskiw.recordmanagerapp.presentation.tool.mvi.MviSideEffect
@@ -12,17 +14,22 @@ import kotlinx.coroutines.launch
 
 class RecordListViewModel(
     savedStateHandle: SavedStateHandle?,
+    private val logger: AppLogger,
     private val searchRecordUseCase: SearchRecordUseCase,
+    private val recordUseCase: RecordUseCase,
 ) : MviViewModel<RecordListUiState, RecordListViewModel.Action, RecordListViewModel.SideEffect>(savedStateHandle) {
 
     sealed interface Action : MviAction {
         data object OnRetryClick : Action
         data object OnAddClick : Action
         data class OnRecordClick(val id: String) : Action
+        data class OnEditClick(val id: String) : Action
+        data class OnDeleteClick(val id: String) : Action
     }
 
     sealed interface SideEffect : MviSideEffect {
         data object NavigateToCreateRecordScreen : SideEffect
+        data class NavigateToEditRecordScreen(val id: String) : SideEffect
         data class NavigateToRecord(val id: String) : SideEffect
     }
 
@@ -41,6 +48,8 @@ class RecordListViewModel(
             is Action.OnRetryClick -> fetchRecords()
             is Action.OnAddClick -> sendSideEffect(SideEffect.NavigateToCreateRecordScreen)
             is Action.OnRecordClick -> sendSideEffect(SideEffect.NavigateToRecord(id = action.id))
+            is Action.OnEditClick -> sendSideEffect(SideEffect.NavigateToEditRecordScreen(id = action.id))
+            is Action.OnDeleteClick -> deleteRecord(action.id)
         }
     }
 
@@ -73,6 +82,14 @@ class RecordListViewModel(
                         )
                     }
                 }
+        }
+    }
+
+    private fun deleteRecord(recordId: String) {
+        viewModelScope.launch {
+            recordUseCase.delete(recordId)
+                .catch { logger.logError("Failed to delete record id:$recordId", it) }
+                .collectLatest {}
         }
     }
 }
