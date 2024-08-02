@@ -16,7 +16,7 @@ class RecordUseCase(
         return recordRepository.insert(record)
     }
 
-    fun update(record: Record): Flow<Nothing> {
+    fun update(record: Record): Flow<Unit> {
         return recordRepository.update(record)
     }
 
@@ -36,7 +36,7 @@ class RecordUseCase(
         }
     }
 
-    fun delete(id: String): Flow<Nothing> {
+    fun delete(id: String): Flow<Unit> {
         return recordRepository.delete(id)
     }
 }

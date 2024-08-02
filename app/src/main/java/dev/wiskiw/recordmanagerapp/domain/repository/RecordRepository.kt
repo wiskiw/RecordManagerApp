@@ -10,11 +10,11 @@ interface RecordRepository {
      */
     fun insert(record: Record): Flow<Record>
 
-    fun update(record: Record): Flow<Nothing>
+    fun update(record: Record): Flow<Unit>
 
     fun get(id: String): Flow<Record>
 
     fun getAll(searchQuery: String?): Flow<List<Record>>
 
-    fun delete(id: String): Flow<Nothing>
+    fun delete(id: String): Flow<Unit>
 }

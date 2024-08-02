@@ -32,7 +32,7 @@ class MockedRecordRepository : RecordRepository {
         TODO("Not yet implemented")
     }
 
-    override fun update(record: Record): Flow<Nothing> {
+    override fun update(record: Record): Flow<Unit> {
         TODO("Not yet implemented")
     }
 
@@ -50,7 +50,7 @@ class MockedRecordRepository : RecordRepository {
         }
     }
 
-    override fun delete(id: String): Flow<Nothing> {
+    override fun delete(id: String): Flow<Unit> {
         TODO("Not yet implemented")
     }
 
