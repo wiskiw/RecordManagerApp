@@ -11,13 +11,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import dev.wiskiw.recordmanagerapp.presentation.theme.RecordManagerTheme
+import dev.wiskiw.recordmanagerapp.presentation.tool.mvi.ConsumeSideEffect
 
 @Composable
 fun RecordListScreen(
+    viewModel: RecordListScreenViewModel,
     navigateToRecord: (String) -> Unit,
 ) {
+    ConsumeSideEffect(
+        viewModel = viewModel
+    ) { sideEffect: RecordListScreenViewModel.SideEffect ->
+        when (sideEffect) {
+            is RecordListScreenViewModel.SideEffect.NavigateToRecord -> navigateToRecord(sideEffect.id)
+        }
+    }
+
     Content(
-        navigateToRecord = navigateToRecord,
+        handleAction = viewModel::handleAction,
     )
 }
 
@@ -25,7 +35,7 @@ fun RecordListScreen(
 @Composable
 private fun Content(
     modifier: Modifier = Modifier,
-    navigateToRecord: (String) -> Unit,
+    handleAction: (RecordListScreenViewModel.Action) -> Unit,
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -34,7 +44,7 @@ private fun Content(
             Text(
                 text = "Record List Screen",
             )
-            Button(onClick = { navigateToRecord("123") }) {
+            Button(onClick = { handleAction(RecordListScreenViewModel.Action.OnRecordClick(id = "123")) }) {
                 Text(
                     text = "Open Record Details",
                 )
@@ -51,7 +61,7 @@ private fun ContentPreviewLight() {
         darkTheme = false,
     ) {
         Content(
-            navigateToRecord = {}
+            handleAction = {}
         )
     }
 }
