@@ -1,4 +1,4 @@
-package dev.wiskiw.recordmanagerapp.ui.theme
+package dev.wiskiw.recordmanagerapp.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
