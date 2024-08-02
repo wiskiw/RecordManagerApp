@@ -22,7 +22,7 @@ import dev.wiskiw.recordmanagerapp.presentation.theme.size
 @Composable
 fun ErrorView(
     modifier: Modifier = Modifier,
-    text: String,
+    text: String?,
     onRetry: () -> Unit,
 ) {
     Column(
@@ -34,7 +34,7 @@ fun ErrorView(
     ) {
         Text(
             textAlign = TextAlign.Center,
-            text = text,
+            text = text ?: stringResource(id = R.string.compose_error_view_generic_error_message),
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.bodyMedium,
         )
@@ -57,7 +57,7 @@ fun ErrorView(
 @Composable
 private fun ErrorPreview() {
     ErrorView(
-        text = "Here is a preview error message",
+        text = null,
         onRetry = {},
     )
 }

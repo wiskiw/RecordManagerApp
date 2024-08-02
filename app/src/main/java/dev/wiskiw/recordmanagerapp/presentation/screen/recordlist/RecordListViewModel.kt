@@ -17,10 +17,12 @@ class RecordListViewModel(
 
     sealed interface Action : MviAction {
         data object OnRetryClick : Action
+        data object OnAddClick : Action
         data class OnRecordClick(val id: String) : Action
     }
 
     sealed interface SideEffect : MviSideEffect {
+        data object NavigateToCreateRecordScreen : SideEffect
         data class NavigateToRecord(val id: String) : SideEffect
     }
 
@@ -37,6 +39,7 @@ class RecordListViewModel(
     override fun handleAction(action: Action) {
         when (action) {
             is Action.OnRetryClick -> fetchRecords()
+            is Action.OnAddClick -> sendSideEffect(SideEffect.NavigateToCreateRecordScreen)
             is Action.OnRecordClick -> sendSideEffect(SideEffect.NavigateToRecord(id = action.id))
         }
     }

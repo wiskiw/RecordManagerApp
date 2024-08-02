@@ -10,7 +10,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -37,18 +37,27 @@ import dev.wiskiw.recordmanagerapp.presentation.compose.ErrorView
 import dev.wiskiw.recordmanagerapp.presentation.compose.ProgressView
 import dev.wiskiw.recordmanagerapp.presentation.theme.RecordManagerTheme
 import dev.wiskiw.recordmanagerapp.presentation.theme.size
+import dev.wiskiw.recordmanagerapp.presentation.tool.mvi.ConsumeSideEffect
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EditRecordScreen(
     viewModel: EditRecordViewModel = koinViewModel(),
-    recordId: String,
+    recordId: String?,
     navigateUp: () -> Unit,
 ) {
     LaunchedEffect(recordId) {
         viewModel.onArgsReceived(
             recordId = recordId,
         )
+    }
+
+    ConsumeSideEffect(
+        viewModel = viewModel
+    ) { sideEffect: EditRecordViewModel.SideEffect ->
+        when (sideEffect) {
+            EditRecordViewModel.SideEffect.NavigateBack -> navigateUp()
+        }
     }
 
     val state by viewModel.uiStateFlow.collectAsStateWithLifecycle()
@@ -67,7 +76,13 @@ private fun Content(
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { TopBar(handleAction) },
+        topBar = {
+            TopBar(
+                isCreateRecordMode = state.isCreateRecordMode,
+                isSaveAvailable = state.isSaveAvailable,
+                handleAction = handleAction,
+            )
+        },
     ) { scaffoldPaddings ->
         when {
             state.isLoading -> ProgressView(
@@ -76,8 +91,8 @@ private fun Content(
 
             state.error != null -> ErrorView(
                 modifier = Modifier.padding(scaffoldPaddings),
-                text = state.error,
-                onRetry = { handleAction(EditRecordViewModel.Action.OnRetryClick) },
+                text = state.error.message,
+                onRetry = { handleAction(state.error.retryAction) },
             )
 
             else -> EditRecordContent(
@@ -94,29 +109,33 @@ private fun Content(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(
+    isCreateRecordMode: Boolean,
+    isSaveAvailable: Boolean,
     handleAction: (EditRecordViewModel.Action) -> Unit,
-
-    ) {
+) {
     TopAppBar(
         colors = topAppBarColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
         ),
         title = {
-            Text(stringResource(id = R.string.screen_edit_title))
+            val titleResId = if (isCreateRecordMode) R.string.screen_edit_title_create else R.string.screen_edit_title_edit
+            Text(stringResource(id = titleResId))
         },
         navigationIcon = {
-            IconButton(onClick = {
-                handleAction(EditRecordViewModel.Action.OnBackClick)
-            }) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "Navigate back")
+            IconButton(onClick = { handleAction(EditRecordViewModel.Action.OnBackClick) }) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(id = R.string.screen_edit_top_bar_button_back_description),
+                )
             }
         },
         actions = {
-
-            IconButton(onClick = { handleAction(EditRecordViewModel.Action.OnSaveClick) }) {
+            IconButton(
+                enabled = isSaveAvailable,
+                onClick = { handleAction(EditRecordViewModel.Action.OnSaveClick) }) {
                 Icon(
                     imageVector = Icons.Filled.Done,
-                    contentDescription = stringResource(id = R.string.screen_edit_tob_but_button_save_description),
+                    contentDescription = stringResource(id = R.string.screen_edit_top_bar_button_save_description),
                 )
             }
         },
@@ -166,7 +185,7 @@ private fun EditRecordContent(
             content = {
                 items(typeChips) { type ->
                     FilterChip(
-                        selected = type.selected,
+                        selected = type.isSelected,
                         label = {
                             Text(
                                 modifier = Modifier.fillMaxSize(),
@@ -184,7 +203,7 @@ private fun EditRecordContent(
 
 @Preview(showBackground = true, device = Devices.PIXEL)
 @Composable
-private fun ContentPreviewLight() {
+private fun ContentEditModePreviewLight() {
     val state = EditRecordUiState(
         recordId = "recordId",
         isLoading = false,

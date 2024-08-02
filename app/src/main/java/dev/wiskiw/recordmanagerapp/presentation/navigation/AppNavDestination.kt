@@ -8,5 +8,8 @@ object AppNavDestination {
     data object RecordList
 
     @Serializable
+    data class EditRecord(val id: String?)
+
+    @Serializable
     data class Record(val id: String)
 }

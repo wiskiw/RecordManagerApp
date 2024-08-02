@@ -4,14 +4,27 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.wiskiw.recordmanagerapp.R
 import dev.wiskiw.recordmanagerapp.domain.model.Record
 import dev.wiskiw.recordmanagerapp.domain.model.RecordType
 import dev.wiskiw.recordmanagerapp.presentation.compose.ErrorView
@@ -25,12 +38,14 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun RecordListScreen(
     viewModel: RecordListViewModel = koinViewModel(),
+    navigateToCreateRecord: () -> Unit,
     navigateToRecord: (String) -> Unit,
 ) {
     ConsumeSideEffect(
         viewModel = viewModel
     ) { sideEffect: RecordListViewModel.SideEffect ->
         when (sideEffect) {
+            RecordListViewModel.SideEffect.NavigateToCreateRecordScreen -> navigateToCreateRecord()
             is RecordListViewModel.SideEffect.NavigateToRecord -> navigateToRecord(sideEffect.id)
         }
     }
@@ -49,7 +64,15 @@ private fun Content(
     state: RecordListUiState,
     handleAction: (RecordListViewModel.Action) -> Unit,
 ) {
-    Scaffold(modifier = modifier.fillMaxSize()) { scaffoldPaddings ->
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = { TopBar() },
+        bottomBar = {
+            BottomBar(
+                handleAction = handleAction,
+            )
+        }
+    ) { scaffoldPaddings ->
         when {
             state.isLoading -> ProgressView(
                 modifier = Modifier.padding(scaffoldPaddings),
@@ -76,6 +99,38 @@ private fun Content(
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar() {
+    TopAppBar(
+        colors = topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        ),
+        title = {
+            Text(stringResource(id = R.string.screen_record_list_title))
+        },
+    )
+}
+
+@Composable
+private fun BottomBar(
+    handleAction: (RecordListViewModel.Action) -> Unit,
+) {
+    BottomAppBar(
+        actions = {},
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { handleAction(RecordListViewModel.Action.OnAddClick) },
+                containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+                elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
+            ) {
+                Icon(Icons.Filled.Add, "Localized description")
+            }
+        }
+    )
+
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL)
