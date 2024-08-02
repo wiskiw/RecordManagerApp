@@ -22,7 +22,7 @@ fun RecordScreen(
 ) {
     LaunchedEffect(recordId) {
         viewModel.onArgsReceived(
-            launchId = recordId,
+            recordId = recordId,
         )
     }
 
