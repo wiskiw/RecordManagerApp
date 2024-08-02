@@ -2,14 +2,13 @@ package dev.wiskiw.recordmanagerapp.presentation.screen.record
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -27,6 +26,7 @@ import dev.wiskiw.recordmanagerapp.domain.model.RecordType
 import dev.wiskiw.recordmanagerapp.domain.model.RecordWithRelations
 import dev.wiskiw.recordmanagerapp.presentation.compose.ErrorView
 import dev.wiskiw.recordmanagerapp.presentation.compose.ProgressView
+import dev.wiskiw.recordmanagerapp.presentation.compose.RecordListView
 import dev.wiskiw.recordmanagerapp.presentation.theme.RecordManagerTheme
 import dev.wiskiw.recordmanagerapp.presentation.theme.size
 import org.koin.androidx.compose.koinViewModel
@@ -82,7 +82,7 @@ private fun RecordWithRelationsContent(
     modifier: Modifier = Modifier,
     recordWithRelations: RecordWithRelations,
 ) {
-    Box(modifier = modifier) {
+    Column(modifier = modifier) {
         val shape = RoundedCornerShape(MaterialTheme.size.one)
         Row(
             modifier = Modifier
@@ -113,6 +113,18 @@ private fun RecordWithRelationsContent(
                 )
             }
         }
+
+        RecordListView(
+            records = recordWithRelations.relations,
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.size.one),
+            contentPadding = PaddingValues(
+                vertical = MaterialTheme.size.three,
+                horizontal = MaterialTheme.size.one,
+            ),
+            onClick = { id ->
+                // TODO
+            }
+        )
     }
 }
 
