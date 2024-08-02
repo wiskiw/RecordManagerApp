@@ -5,8 +5,8 @@ import dev.wiskiw.recordmanagerapp.presentation.tool.mvi.MviAction
 import dev.wiskiw.recordmanagerapp.presentation.tool.mvi.MviSideEffect
 import dev.wiskiw.recordmanagerapp.presentation.tool.mvi.MviViewModel
 
-class RecordScreenViewModel(savedStateHandle: SavedStateHandle?) :
-    MviViewModel<RecordUiState, RecordScreenViewModel.Action, RecordScreenViewModel.SideEffect>(savedStateHandle) {
+class RecordViewModel(savedStateHandle: SavedStateHandle?) :
+    MviViewModel<RecordUiState, RecordViewModel.Action, RecordViewModel.SideEffect>(savedStateHandle) {
 
     sealed interface Action : MviAction
 

@@ -10,19 +10,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import dev.wiskiw.recordmanagerapp.presentation.screen.record.RecordViewModel
 import dev.wiskiw.recordmanagerapp.presentation.theme.RecordManagerTheme
 import dev.wiskiw.recordmanagerapp.presentation.tool.mvi.ConsumeSideEffect
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RecordListScreen(
-    viewModel: RecordListScreenViewModel,
+    viewModel: RecordListViewModel = koinViewModel(),
     navigateToRecord: (String) -> Unit,
 ) {
     ConsumeSideEffect(
         viewModel = viewModel
-    ) { sideEffect: RecordListScreenViewModel.SideEffect ->
+    ) { sideEffect: RecordListViewModel.SideEffect ->
         when (sideEffect) {
-            is RecordListScreenViewModel.SideEffect.NavigateToRecord -> navigateToRecord(sideEffect.id)
+            is RecordListViewModel.SideEffect.NavigateToRecord -> navigateToRecord(sideEffect.id)
         }
     }
 
@@ -35,7 +37,7 @@ fun RecordListScreen(
 @Composable
 private fun Content(
     modifier: Modifier = Modifier,
-    handleAction: (RecordListScreenViewModel.Action) -> Unit,
+    handleAction: (RecordListViewModel.Action) -> Unit,
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -44,7 +46,7 @@ private fun Content(
             Text(
                 text = "Record List Screen",
             )
-            Button(onClick = { handleAction(RecordListScreenViewModel.Action.OnRecordClick(id = "123")) }) {
+            Button(onClick = { handleAction(RecordListViewModel.Action.OnRecordClick(id = "123")) }) {
                 Text(
                     text = "Open Record Details",
                 )

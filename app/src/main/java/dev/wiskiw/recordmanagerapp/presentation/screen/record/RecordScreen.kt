@@ -10,13 +10,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.wiskiw.recordmanagerapp.presentation.theme.RecordManagerTheme
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RecordScreen(
-    viewModel: RecordScreenViewModel,
+    viewModel: RecordViewModel = koinViewModel(),
     recordId: String,
     navigateUp: () -> Unit,
 ) {
