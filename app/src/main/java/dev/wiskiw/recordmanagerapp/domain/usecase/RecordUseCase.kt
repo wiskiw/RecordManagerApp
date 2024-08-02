@@ -1,10 +1,11 @@
 package dev.wiskiw.recordmanagerapp.domain.usecase
 
 import dev.wiskiw.recordmanagerapp.domain.model.Record
+import dev.wiskiw.recordmanagerapp.domain.model.RecordWithRelations
 import dev.wiskiw.recordmanagerapp.domain.repository.RecordRelationsRepository
 import dev.wiskiw.recordmanagerapp.domain.repository.RecordRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 
 class RecordUseCase(
     private val recordRepository: RecordRepository,
@@ -23,11 +24,19 @@ class RecordUseCase(
         return recordRepository.get(id)
     }
 
-    fun delete(id: String): Flow<Nothing> {
-        return recordRepository.delete(id)
+    fun getWithRelations(id: String): Flow<RecordWithRelations> {
+        return combine(
+            recordRepository.get(id),
+            recordRelationsRepository.getAll(id)
+        ) { record, relations ->
+            RecordWithRelations(
+                record = record,
+                relations = relations,
+            )
+        }
     }
 
-    fun getRelatedRecords(id: String): Flow<List<Record>> {
-        return recordRelationsRepository.getAll(id)
+    fun delete(id: String): Flow<Nothing> {
+        return recordRepository.delete(id)
     }
 }
