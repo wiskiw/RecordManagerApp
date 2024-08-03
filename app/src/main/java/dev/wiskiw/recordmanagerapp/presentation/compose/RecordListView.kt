@@ -31,7 +31,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.DpOffset
 import dev.wiskiw.recordmanagerapp.R
 import dev.wiskiw.recordmanagerapp.domain.model.Record
 import dev.wiskiw.recordmanagerapp.domain.model.RecordType
@@ -46,8 +45,8 @@ fun RecordListView(
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(MaterialTheme.size.one),
     records: List<Record>,
     onClick: (String) -> Unit,
-    onEditClick: (String) -> Unit,
-    onDeleteClick: (String) -> Unit,
+    onEditClick: ((String) -> Unit)? = null,
+    onDeleteClick: ((String) -> Unit)? = null,
 ) {
     LazyColumn(
         modifier = modifier, verticalArrangement = verticalArrangement, contentPadding = contentPadding
@@ -57,8 +56,8 @@ fun RecordListView(
                 modifier = Modifier.fillMaxWidth(),
                 record = record,
                 onClick = { onClick(record.id) },
-                onEditClick = { onEditClick(record.id) },
-                onDeleteClick = { onDeleteClick(record.id) },
+                onEditClick = onEditClick?.let { { onEditClick(record.id) } },
+                onDeleteClick = onDeleteClick?.let { { onDeleteClick(record.id) } },
             )
         }
     }
@@ -69,9 +68,10 @@ private fun RecordItem(
     modifier: Modifier = Modifier,
     record: Record,
     onClick: () -> Unit,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit,
+    onEditClick: (() -> Unit)? = null,
+    onDeleteClick: (() -> Unit)? = null,
 ) {
+    val isMenuAvailable = onEditClick != null && onDeleteClick != null
     var menuExpanded by remember { mutableStateOf(false) }
 
     val shape = RoundedCornerShape(MaterialTheme.size.one)
@@ -104,33 +104,36 @@ private fun RecordItem(
                 maxLines = 1,
             )
         }
-        Box {
-            IconButton(
-                onClick = { menuExpanded = true },
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.MoreVert,
-                    contentDescription = stringResource(id = R.string.compose_record_list_view_button_record_menu_description),
-                )
-            }
-            DropdownMenu(
-                expanded = menuExpanded,
-                onDismissRequest = { menuExpanded = false },
-            ) {
-                DropdownMenuItem(
-                    text = { Text(text = "Edit") },
-                    onClick = {
-                        menuExpanded = false
-                        onEditClick.invoke()
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text(text = "Delete") },
-                    onClick = {
-                        menuExpanded = false
-                        onDeleteClick.invoke()
-                    }
-                )
+
+        if (isMenuAvailable) {
+            Box {
+                IconButton(
+                    onClick = { menuExpanded = true },
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.MoreVert,
+                        contentDescription = stringResource(id = R.string.compose_record_list_view_button_record_menu_description),
+                    )
+                }
+                DropdownMenu(
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false },
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(text = "Edit") },
+                        onClick = {
+                            menuExpanded = false
+                            onEditClick?.invoke()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(text = "Delete") },
+                        onClick = {
+                            menuExpanded = false
+                            onDeleteClick?.invoke()
+                        }
+                    )
+                }
             }
         }
     }

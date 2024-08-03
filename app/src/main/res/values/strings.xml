@@ -3,12 +3,18 @@
 
     <string name="screen_record_list_title">Records</string>
 
+    <string name="screen_record_title">Record</string>
+    <string name="screen_record_top_bar_button_back_description">Back Button</string>
+    <string name="screen_record_name_title">Name</string>
+    <string name="screen_record_description_title">Description</string>
+    <string name="screen_record_type_title">Description</string>
+    <string name="screen_record_relations_title">Relations</string>
 
     <string name="screen_edit_title_edit">Edit Record</string>
     <string name="screen_edit_title_create">Create Record</string>
     <string name="screen_edit_top_bar_button_back_description">Back Button</string>
     <string name="screen_edit_top_bar_button_save_description">Save Button</string>
-    <string name="screen_edit_record_name_title">Name:</string>
+    <string name="screen_edit_record_name_title">Name</string>
     <string name="screen_edit_record_description_title">Description</string>
 
     <string name="compose_record_list_view_button_record_menu_description">Save Button</string>
