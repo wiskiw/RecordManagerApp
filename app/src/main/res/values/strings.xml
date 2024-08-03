@@ -24,6 +24,7 @@
     <string name="screen_edit_record_description_title">Description</string>
 
     <string name="compose_record_list_view_button_record_menu_description">Save Button</string>
+    <string name="compose_record_list_view_item_title_template">%1$s: %2$s</string>
     <string name="compose_error_view_retry_button_label">Retry</string>
     <string name="compose_error_view_generic_error_message">Something bad happened :(</string>
 </resources>

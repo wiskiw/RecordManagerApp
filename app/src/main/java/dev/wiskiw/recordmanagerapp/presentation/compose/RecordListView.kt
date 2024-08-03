@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import dev.wiskiw.recordmanagerapp.R
@@ -101,19 +102,26 @@ private fun RecordItem(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(
+            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.size.half),
         ) {
             Text(
-                text = record.id,
+                text = stringResource(
+                    id = R.string.compose_record_list_view_item_title_template,
+                    record.name,
+                    record.type.name,
+                ),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleLarge,
                 maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = record.name,
+                text = record.description,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
 
@@ -163,20 +171,20 @@ private fun PreviewLight() {
         Record(
             id = "r-1",
             type = RecordType.Desk,
-            name = "name-1",
+            name = "Name A",
             description = "description-1",
         ),
         Record(
             id = "r-2",
             type = RecordType.Server,
-            name = "name-2",
+            name = "Name B",
             description = "description-2",
         ),
         Record(
             id = "r-3",
             type = RecordType.Employee,
-            name = "name-3",
-            description = "description-3",
+            name = "Name C",
+            description = "Super duper long description text here and few more words here please",
         ),
     )
 
