@@ -4,7 +4,7 @@ import dev.wiskiw.recordmanagerapp.domain.model.Record
 import dev.wiskiw.recordmanagerapp.domain.repository.RecordRelationsRepository
 import dev.wiskiw.recordmanagerapp.domain.repository.RecordRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 
 class RecordRelationsUseCase(
     private val recordRepository: RecordRepository,
@@ -12,14 +12,18 @@ class RecordRelationsUseCase(
 ) {
 
     fun getRelatedRecords(id: String): Flow<List<Record>> {
-        return recordRelationsRepository.getAll(id)
+        return recordRelationsRepository.getRelatedRecords(id)
     }
 
     fun getAvailableRelations(id: String): Flow<List<Record>> {
-        return recordRepository.getAll(null)
-            .map { recordList ->
-                recordList.filter { record -> record.id != id }
-            }
+        return combine(
+            recordRelationsRepository.getRelatedRecords(id),
+            recordRepository.getAll(null),
+        ) { relatedRecords, allRecords ->
+            allRecords
+                .filterNot { record -> record.id == id }
+                .filterNot { record -> relatedRecords.contains(record) }
+        }
     }
 
     fun saveRelation(id: String, relatedRecordId: String): Flow<Unit> {

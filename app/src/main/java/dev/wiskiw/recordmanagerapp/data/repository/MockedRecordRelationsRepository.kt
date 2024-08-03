@@ -28,7 +28,7 @@ class MockedRecordRelationsRepository : RecordRelationsRepository {
         }
     }
 
-    override fun getAll(id: String): Flow<List<Record>> {
+    override fun getRelatedRecords(id: String): Flow<List<Record>> {
         return flow {
             delay(1.seconds.inWholeMilliseconds)
             emit(recordList)

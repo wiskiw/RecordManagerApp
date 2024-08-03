@@ -17,9 +17,9 @@ class RoomRecordRelationsRepository(
     private val recordMapper: DataMapper<Record, RecordEntity>,
 ) : RecordRelationsRepository {
 
-    override fun getAll(id: String): Flow<List<Record>> {
-        return recordEntityDao.getRecordWithRelations(recordId = recordIdMapper.mapToDto(id))
-            .map { recordWithRelationsEntity -> recordMapper.mapAllToDomain(recordWithRelationsEntity.relatedRecords) }
+    override fun getRelatedRecords(id: String): Flow<List<Record>> {
+        return recordEntityDao.getRelatedRecords(id = recordIdMapper.mapToDto(id))
+            .map { relatedRecordEntities -> recordMapper.mapAllToDomain(relatedRecordEntities) }
     }
 
     override fun addRelation(id: String, relatedId: String): Flow<Unit> {
@@ -36,9 +36,9 @@ class RoomRecordRelationsRepository(
 
     override fun removeRelation(id: String, relatedId: String): Flow<Unit> {
         return flow {
-            recordEntityDao.deleteRecordRelation(
-                recordId = recordIdMapper.mapToDto(id),
-                relatedRecordId = recordIdMapper.mapToDto(relatedId),
+            recordEntityDao.deleteRecordRelations(
+                firstRecordId = recordIdMapper.mapToDto(id),
+                secondRecordId = recordIdMapper.mapToDto(relatedId),
             )
             emit(Unit)
         }

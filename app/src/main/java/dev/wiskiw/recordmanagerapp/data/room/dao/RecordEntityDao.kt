@@ -1,14 +1,11 @@
 package dev.wiskiw.recordmanagerapp.data.room.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Transaction
 import androidx.room.Update
 import dev.wiskiw.recordmanagerapp.data.room.dto.RecordEntity
 import dev.wiskiw.recordmanagerapp.data.room.dto.RecordRelationCrossRef
-import dev.wiskiw.recordmanagerapp.data.room.dto.RecordWithRelationsEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -32,10 +29,26 @@ interface RecordEntityDao {
     @Insert
     suspend fun insertRecordRelationCrossRef(recordRelationCrossRef: RecordRelationCrossRef): Long
 
-    @Query("DELETE FROM record_relations WHERE record_id = :recordId AND related_record_id = :relatedRecordId")
-    suspend fun deleteRecordRelation(recordId: Long, relatedRecordId: Long)
+    @Query(
+        """
+        DELETE FROM record_relations 
+        WHERE 
+            (record_id = :firstRecordId AND related_record_id = :secondRecordId) 
+            OR 
+            (record_id = :secondRecordId AND related_record_id = :firstRecordId) 
+        """
+    )
+    suspend fun deleteRecordRelations(firstRecordId: Long, secondRecordId: Long)
 
-    @Transaction
-    @Query("SELECT * FROM records WHERE id = :recordId")
-    fun getRecordWithRelations(recordId: Long): Flow<RecordWithRelationsEntity>
+    @Query(
+        """
+        SELECT * FROM records 
+        WHERE id IN (
+            SELECT record_id FROM record_relations WHERE related_record_id = :id
+            UNION
+            SELECT related_record_id FROM record_relations WHERE record_id = :id
+        )
+        """
+    )
+    fun getRelatedRecords(id: Long): Flow<List<RecordEntity>>
 }

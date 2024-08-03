@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface RecordRelationsRepository {
 
-    fun getAll(id: String): Flow<List<Record>>
+    fun getRelatedRecords(id: String): Flow<List<Record>>
 
     fun addRelation(id: String, relatedId: String): Flow<Unit>
 
