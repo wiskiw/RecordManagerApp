@@ -1,7 +1,7 @@
 package dev.wiskiw.recordmanagerapp.data.room.mapper
 
 import dev.wiskiw.recordmanagerapp.data.DataMapper
-import dev.wiskiw.recordmanagerapp.data.room.model.RecordEntity
+import dev.wiskiw.recordmanagerapp.data.room.dto.RecordEntity
 import dev.wiskiw.recordmanagerapp.domain.model.Record
 
 class RecordMapper(

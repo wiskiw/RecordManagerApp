@@ -7,7 +7,7 @@ interface RecordRelationsRepository {
 
     fun getAll(id: String): Flow<List<Record>>
 
-    fun insert(id: String, relatedRecordIds: List<String>)
+    fun addRelation(id: String, relatedId: String): Flow<Unit>
 
-    fun delete(id: String)
+    fun removeRelation(id: String, relatedId: String): Flow<Unit>
 }

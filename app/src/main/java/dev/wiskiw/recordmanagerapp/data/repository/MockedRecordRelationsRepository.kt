@@ -35,13 +35,12 @@ class MockedRecordRelationsRepository : RecordRelationsRepository {
         }
     }
 
-    override fun insert(id: String, relatedRecordIds: List<String>) {
+    override fun addRelation(id: String, relatedId: String): Flow<Unit> {
         TODO("Not yet implemented")
     }
 
-    override fun delete(id: String) {
+    override fun removeRelation(id: String, relatedId: String): Flow<Unit> {
         TODO("Not yet implemented")
     }
-
 
 }

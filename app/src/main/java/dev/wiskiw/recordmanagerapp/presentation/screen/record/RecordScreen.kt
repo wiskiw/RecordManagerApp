@@ -1,11 +1,11 @@
 package dev.wiskiw.recordmanagerapp.presentation.screen.record
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,17 +33,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.wiskiw.recordmanagerapp.R
 import dev.wiskiw.recordmanagerapp.domain.model.Record
 import dev.wiskiw.recordmanagerapp.domain.model.RecordType
-import dev.wiskiw.recordmanagerapp.domain.model.RecordWithRelations
 import dev.wiskiw.recordmanagerapp.presentation.compose.ErrorView
 import dev.wiskiw.recordmanagerapp.presentation.compose.ProgressView
 import dev.wiskiw.recordmanagerapp.presentation.compose.RecordListView
-import dev.wiskiw.recordmanagerapp.presentation.screen.editrecord.EditRecordViewModel
 import dev.wiskiw.recordmanagerapp.presentation.theme.RecordManagerTheme
 import dev.wiskiw.recordmanagerapp.presentation.theme.size
 import dev.wiskiw.recordmanagerapp.presentation.tool.mvi.ConsumeSideEffect
@@ -99,9 +96,13 @@ private fun Content(
                 onRetry = { handleAction(RecordViewModel.Action.OnRetryClick) },
             )
 
-            state.recordWithRelations != null -> RecordWithRelationsContent(
+            state.record != null -> RecordWithRelationsContent(
                 modifier = Modifier.padding(scaffoldPaddings),
-                recordWithRelations = state.recordWithRelations,
+                handleAction = handleAction,
+                isRelationsPickerExposed = state.isRelationsPickerExposed,
+                record = state.record,
+                relations = state.relations,
+                availableRelations = state.availableRelations,
             )
         }
     }
@@ -151,74 +152,84 @@ private fun BottomBar(
 @Composable
 private fun RecordWithRelationsContent(
     modifier: Modifier = Modifier,
-    recordWithRelations: RecordWithRelations,
+    handleAction: (RecordViewModel.Action) -> Unit,
+    isRelationsPickerExposed: Boolean,
+    record: Record,
+    relations: List<Record>,
+    availableRelations: List<Record>,
 ) {
-    Column(
+    Box(
         modifier = modifier,
     ) {
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(MaterialTheme.size.one),
-            readOnly = true,
-            label = {
-                Text(text = stringResource(id = R.string.screen_record_name_title))
-            },
-            value = recordWithRelations.record.name,
-            onValueChange = { },
-        )
+        Column {
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(MaterialTheme.size.one),
+                readOnly = true,
+                label = {
+                    Text(text = stringResource(id = R.string.screen_record_name_title))
+                },
+                value = record.name,
+                onValueChange = { },
+            )
 
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(MaterialTheme.size.one),
-            readOnly = true,
-            minLines = 4,
-            label = {
-                Text(text = stringResource(id = R.string.screen_record_description_title))
-            },
-            value = recordWithRelations.record.description,
-            onValueChange = { },
-        )
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(MaterialTheme.size.one),
+                readOnly = true,
+                minLines = 4,
+                label = {
+                    Text(text = stringResource(id = R.string.screen_record_description_title))
+                },
+                value = record.description,
+                onValueChange = { },
+            )
 
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(MaterialTheme.size.one),
-            readOnly = true,
-            label = {
-                Text(text = stringResource(id = R.string.screen_record_type_title))
-            },
-            value = recordWithRelations.record.type.name,
-            onValueChange = { },
-        )
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(MaterialTheme.size.one),
+                readOnly = true,
+                label = {
+                    Text(text = stringResource(id = R.string.screen_record_type_title))
+                },
+                value = record.type.name,
+                onValueChange = { },
+            )
 
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    top = MaterialTheme.size.one,
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        top = MaterialTheme.size.one,
+                        start = MaterialTheme.size.one,
+                        end = MaterialTheme.size.one,
+                    ),
+                text = stringResource(id = R.string.screen_record_relations_title),
+            )
+
+            RecordListView(
+                records = relations,
+                verticalArrangement = Arrangement.spacedBy(MaterialTheme.size.one),
+                contentPadding = PaddingValues(
+                    top = MaterialTheme.size.half,
+                    bottom = MaterialTheme.size.one,
                     start = MaterialTheme.size.one,
                     end = MaterialTheme.size.one,
                 ),
-            text = stringResource(id = R.string.screen_record_relations_title),
-        )
-
-        RecordListView(
-            records = recordWithRelations.relations,
-            verticalArrangement = Arrangement.spacedBy(MaterialTheme.size.one),
-            contentPadding = PaddingValues(
-                top = MaterialTheme.size.half,
-                bottom = MaterialTheme.size.one,
-                start = MaterialTheme.size.one,
-                end = MaterialTheme.size.one,
-            ),
-            onClick = { id ->
-                // TODO
-            },
-            onEditClick = {},
-            onDeleteClick = {},
-        )
+                onDeleteClick = { id ->
+                    handleAction(RecordViewModel.Action.OnRelationDelete(id))
+                },
+            )
+        }
+        if (isRelationsPickerExposed) {
+            RelationsPickerDialog(
+                handleAction = handleAction,
+                records = availableRelations,
+            )
+        }
     }
 }
 
@@ -249,41 +260,41 @@ private fun RelationsPickerDialog(
 @Preview(showBackground = true, device = Devices.PIXEL)
 @Composable
 private fun ContentPreviewLight() {
-    val recordWithRelations = RecordWithRelations(
-        record = Record(
-            id = "main123",
+    val record = Record(
+        id = "main123",
+        type = RecordType.Desk,
+        name = "Main Record",
+        description = "description here",
+    )
+    val relations = listOf(
+        Record(
+            id = "r-1",
             type = RecordType.Desk,
-            name = "Main Record",
-            description = "description here",
+            name = "name-1",
+            description = "description-1",
         ),
-        relations = listOf(
-            Record(
-                id = "r-1",
-                type = RecordType.Desk,
-                name = "name-1",
-                description = "description-1",
-            ),
-            Record(
-                id = "r-2",
-                type = RecordType.Server,
-                name = "name-2",
-                description = "description-2",
-            ),
-            Record(
-                id = "r-3",
-                type = RecordType.Employee,
-                name = "name-3",
-                description = "description-3",
-            ),
+        Record(
+            id = "r-2",
+            type = RecordType.Server,
+            name = "name-2",
+            description = "description-2",
+        ),
+        Record(
+            id = "r-3",
+            type = RecordType.Employee,
+            name = "name-3",
+            description = "description-3",
         ),
     )
 
     val state = RecordUiState(
-        recordId = recordWithRelations.record.id,
-        recordWithRelations = recordWithRelations,
+        recordId = record.id,
+        record = record,
+        relations = relations,
+        availableRelations = emptyList(),
         isLoading = false,
         error = null,
-        isRelationsPickerExposed = false
+        isRelationsPickerExposed = false,
     )
 
     RecordManagerTheme(

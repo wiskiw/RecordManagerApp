@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import dev.wiskiw.recordmanagerapp.R
@@ -44,22 +45,34 @@ fun RecordListView(
     contentPadding: PaddingValues = PaddingValues(),
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(MaterialTheme.size.one),
     records: List<Record>,
-    onClick: (String) -> Unit,
+    onClick: ((String) -> Unit)? = null,
     onEditClick: ((String) -> Unit)? = null,
     onDeleteClick: ((String) -> Unit)? = null,
 ) {
-    LazyColumn(
-        modifier = modifier, verticalArrangement = verticalArrangement, contentPadding = contentPadding
-    ) {
-        items(records) { record ->
-            RecordItem(
-                modifier = Modifier.fillMaxWidth(),
-                record = record,
-                onClick = { onClick(record.id) },
-                onEditClick = onEditClick?.let { { onEditClick(record.id) } },
-                onDeleteClick = onDeleteClick?.let { { onDeleteClick(record.id) } },
-            )
+    if (records.isNotEmpty()) {
+        LazyColumn(
+            modifier = modifier,
+            verticalArrangement = verticalArrangement,
+            contentPadding = contentPadding,
+        ) {
+            items(records) { record ->
+                RecordItem(
+                    modifier = Modifier.fillMaxWidth(),
+                    record = record,
+                    onClick = onClick?.let { { onClick(record.id) } },
+                    onEditClick = onEditClick?.let { { onEditClick(record.id) } },
+                    onDeleteClick = onDeleteClick?.let { { onDeleteClick(record.id) } },
+                )
+            }
         }
+    } else {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(MaterialTheme.size.one),
+            textAlign = TextAlign.Center,
+            text = stringResource(id = R.string.screen_record_list_no_records),
+        )
     }
 }
 
@@ -67,11 +80,10 @@ fun RecordListView(
 private fun RecordItem(
     modifier: Modifier = Modifier,
     record: Record,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)? = null,
     onEditClick: (() -> Unit)? = null,
     onDeleteClick: (() -> Unit)? = null,
 ) {
-    val isMenuAvailable = onEditClick != null && onDeleteClick != null
     var menuExpanded by remember { mutableStateOf(false) }
 
     val shape = RoundedCornerShape(MaterialTheme.size.one)
@@ -83,7 +95,7 @@ private fun RecordItem(
                 shape = shape,
             )
             .clip(shape)
-            .clickable { onClick.invoke() }
+            .clickable { onClick?.invoke() }
             .padding(MaterialTheme.size.one),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -105,6 +117,7 @@ private fun RecordItem(
             )
         }
 
+        val isMenuAvailable = onEditClick != null || onDeleteClick != null
         if (isMenuAvailable) {
             Box {
                 IconButton(
@@ -119,20 +132,24 @@ private fun RecordItem(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
                 ) {
-                    DropdownMenuItem(
-                        text = { Text(text = "Edit") },
-                        onClick = {
-                            menuExpanded = false
-                            onEditClick?.invoke()
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(text = "Delete") },
-                        onClick = {
-                            menuExpanded = false
-                            onDeleteClick?.invoke()
-                        }
-                    )
+                    if (onEditClick != null) {
+                        DropdownMenuItem(
+                            text = { Text(text = "Edit") },
+                            onClick = {
+                                menuExpanded = false
+                                onEditClick.invoke()
+                            }
+                        )
+                    }
+                    if (onDeleteClick != null) {
+                        DropdownMenuItem(
+                            text = { Text(text = "Delete") },
+                            onClick = {
+                                menuExpanded = false
+                                onDeleteClick.invoke()
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -168,6 +185,21 @@ private fun PreviewLight() {
     ) {
         RecordListView(
             records = records,
+            onClick = {},
+            onEditClick = {},
+            onDeleteClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, device = Devices.PIXEL)
+@Composable
+private fun PreviewEmptyLight() {
+    RecordManagerTheme(
+        darkTheme = false,
+    ) {
+        RecordListView(
+            records = emptyList(),
             onClick = {},
             onEditClick = {},
             onDeleteClick = {},

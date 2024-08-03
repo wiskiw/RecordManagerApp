@@ -2,8 +2,8 @@ package dev.wiskiw.recordmanagerapp.data.repository
 
 import dev.wiskiw.recordmanagerapp.data.DataMapper
 import dev.wiskiw.recordmanagerapp.data.DataMapper.Companion.mapAllToDomain
-import dev.wiskiw.recordmanagerapp.data.room.RecordEntityDao
-import dev.wiskiw.recordmanagerapp.data.room.model.RecordEntity
+import dev.wiskiw.recordmanagerapp.data.room.dao.RecordEntityDao
+import dev.wiskiw.recordmanagerapp.data.room.dto.RecordEntity
 import dev.wiskiw.recordmanagerapp.domain.model.Record
 import dev.wiskiw.recordmanagerapp.domain.repository.RecordRepository
 import kotlinx.coroutines.flow.Flow

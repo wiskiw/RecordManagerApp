@@ -3,13 +3,14 @@ package dev.wiskiw.recordmanagerapp.app
 import androidx.room.Room
 import dev.wiskiw.recordmanagerapp.app.logger.AndroidLogger
 import dev.wiskiw.recordmanagerapp.app.logger.AppLogger
-import dev.wiskiw.recordmanagerapp.data.repository.MockedRecordRelationsRepository
+import dev.wiskiw.recordmanagerapp.data.repository.RoomRecordRelationsRepository
 import dev.wiskiw.recordmanagerapp.data.repository.RoomRecordRepository
 import dev.wiskiw.recordmanagerapp.data.room.AppRoomDatabase
 import dev.wiskiw.recordmanagerapp.data.room.mapper.RecordIdMapper
 import dev.wiskiw.recordmanagerapp.data.room.mapper.RecordMapper
 import dev.wiskiw.recordmanagerapp.domain.repository.RecordRelationsRepository
 import dev.wiskiw.recordmanagerapp.domain.repository.RecordRepository
+import dev.wiskiw.recordmanagerapp.domain.usecase.RecordRelationsUseCase
 import dev.wiskiw.recordmanagerapp.domain.usecase.RecordUseCase
 import dev.wiskiw.recordmanagerapp.domain.usecase.SearchRecordUseCase
 import dev.wiskiw.recordmanagerapp.presentation.screen.editrecord.EditRecordViewModel
@@ -20,7 +21,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val viewModelModule = module {
-    viewModel { RecordViewModel(get(), get(), get()) }
+    viewModel { RecordViewModel(get(), get(), get(), get()) }
     viewModel { RecordListViewModel(get(), get(), get(), get()) }
     viewModel { EditRecordViewModel(get(), get(), get()) }
 }
@@ -46,10 +47,20 @@ val appModule = module {
             recordMapper = recordMapper,
         )
     }
-    // TODO replace with real implementation
-    single<RecordRelationsRepository> { MockedRecordRelationsRepository() }
+    single<RecordRelationsRepository> {
+        val roomDatabase = get<AppRoomDatabase>()
+        val idMapper = RecordIdMapper()
+        val recordMapper = RecordMapper(idMapper)
+
+        RoomRecordRelationsRepository(
+            recordEntityDao = roomDatabase.recordEntityDao(),
+            recordIdMapper = idMapper,
+            recordMapper = recordMapper,
+        )
+    }
 
     // creating UseCases
-    single { RecordUseCase(get(), get()) }
+    single { RecordUseCase(get()) }
+    single { RecordRelationsUseCase(get(), get()) }
     single { SearchRecordUseCase(get()) }
 }

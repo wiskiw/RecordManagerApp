@@ -2,6 +2,7 @@
     <string name="app_name">Record Manager</string>
 
     <string name="screen_record_list_title">Records</string>
+    <string name="screen_record_list_no_records">No available records found</string>
 
     <string name="screen_record_title">Record</string>
     <string name="screen_record_top_bar_button_back_description">Back Button</string>
