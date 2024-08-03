@@ -5,4 +5,7 @@ enum class RecordType {
     Server,
     Desk,
     Calculator,
+    Keyboard,
+    Laptop,
+    Phone,
 }

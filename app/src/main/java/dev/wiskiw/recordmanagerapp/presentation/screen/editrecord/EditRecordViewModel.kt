@@ -13,9 +13,9 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 /**
- * Create and edit [Record] screen.
- * 
- * The [EditRecordUiState.recordId] defines the screen mod: edit mode if [EditRecordUiState.recordId] has not null value.
+ * A ViewModel for creating and editing [Record].
+ *
+ * The [EditRecordUiState.recordId] defines the screen mod: edit mode when [EditRecordUiState.recordId] has not null value.
  */
 class EditRecordViewModel(
     savedStateHandle: SavedStateHandle?,

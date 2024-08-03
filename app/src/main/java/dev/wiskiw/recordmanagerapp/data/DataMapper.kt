@@ -2,6 +2,9 @@ package dev.wiskiw.recordmanagerapp.data
 
 import dev.wiskiw.recordmanagerapp.data.model.MapperException
 
+/**
+ * An interface for mapping between domain models and data transfer objects (DTOs).
+ */
 interface DataMapper<DomainModel, DtoModel> {
 
     companion object {

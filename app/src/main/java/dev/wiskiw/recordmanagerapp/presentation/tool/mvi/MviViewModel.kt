@@ -17,24 +17,48 @@ abstract class MviViewModel<State : Any, Action : MviAction, SideEffect : MviSid
     private val savedStateHandle: SavedStateHandle?,
 ) : ViewModel() {
 
+    /**
+     * A channel that emits side effects to be consumed by the view.
+     * Use [sideEffect] to access side effects from a View.
+     */
     private val sideEffectChannel = Channel<SideEffect>(capacity = Channel.BUFFERED)
     val sideEffect: Flow<SideEffect>
         get() = sideEffectChannel.receiveAsFlow()
 
-
+    /**
+     * The key used to save and restore the UI state in [SavedStateHandle].
+     * Default is the class name.
+     */
     protected open val uiStateKey: String = this.javaClass.name
+
+    /**
+    * The initial UI state, either restored from [SavedStateHandle] or created by [createInitialUiState].
+    */
     private val initialUiState: State by lazy { savedStateHandle?.get<State>(uiStateKey) ?: createInitialUiState() }
 
+
+    /**
+     * A mutable state flow that holds the current UI state.
+     * Use [uiStateFlow] to access state from a View.
+     */
     private val internalUiStateFlow = MutableStateFlow(initialUiState)
     val uiStateFlow: StateFlow<State> = internalUiStateFlow.asStateFlow()
 
+    /**
+     * Creates the initial UI state when no saved state is available.
+     */
     abstract fun createInitialUiState(): State
 
+    /**
+     * Updates the current UI state using [updater] function.
+     *
+     * @param updater A lambda function that takes the current state and returns the updated state.
+     */
     protected fun updateState(updater: State.() -> State) {
         internalUiStateFlow.update {
             val newState = updater.invoke(it)
 
-            // Save updated state to savedStateHandle id possible
+            // Save updated state to savedStateHandle if possible
             if (savedStateHandle != null && newState is Parcelable) {
                 savedStateHandle[uiStateKey] = newState
             }
@@ -43,10 +67,13 @@ abstract class MviViewModel<State : Any, Action : MviAction, SideEffect : MviSid
         }
     }
 
+    /**
+     * Handles an action dispatched from the view.
+     */
     abstract fun handleAction(action: Action)
 
     /**
-     *  Send single-time-side-effect to the View
+     * Sends a side effect to the view. Side effects are intended to be consumed only once.
      */
     protected fun sendSideEffect(sideEffect: SideEffect) {
         viewModelScope.launch {
