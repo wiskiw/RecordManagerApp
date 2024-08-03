@@ -3,9 +3,13 @@
 
     <string name="screen_record_list_title">Records</string>
     <string name="screen_record_list_no_records">No available records found</string>
+    <string name="screen_record_list_bottom_bar_button_add_description">Add Record Button</string>
+    <string name="screen_record_list_bottom_bar_button_add_title">Add Record</string>
 
     <string name="screen_record_title">Record</string>
     <string name="screen_record_top_bar_button_back_description">Back Button</string>
+    <string name="screen_record_bottom_bar_button_add_description">Add Relation Button</string>
+    <string name="screen_record_bottom_bar_button_add_title">Add Relation</string>
     <string name="screen_record_name_title">Name</string>
     <string name="screen_record_description_title">Description</string>
     <string name="screen_record_type_title">Description</string>
