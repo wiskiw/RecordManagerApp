@@ -18,6 +18,10 @@ class RecordUseCase(
         return recordRepository.update(record)
     }
 
+    fun getAll(): Flow<List<Record>> {
+        return recordRepository.getAll()
+    }
+
     fun get(id: String): Flow<Record> {
         return recordRepository.get(id)
     }

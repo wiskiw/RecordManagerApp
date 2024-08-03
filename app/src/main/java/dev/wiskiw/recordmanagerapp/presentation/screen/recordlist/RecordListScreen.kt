@@ -1,24 +1,27 @@
 package dev.wiskiw.recordmanagerapp.presentation.screen.recordlist
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
@@ -35,7 +38,6 @@ import dev.wiskiw.recordmanagerapp.domain.model.RecordType
 import dev.wiskiw.recordmanagerapp.presentation.compose.ErrorView
 import dev.wiskiw.recordmanagerapp.presentation.compose.ProgressView
 import dev.wiskiw.recordmanagerapp.presentation.compose.RecordListView
-import dev.wiskiw.recordmanagerapp.presentation.screen.record.RecordViewModel
 import dev.wiskiw.recordmanagerapp.presentation.theme.RecordManagerTheme
 import dev.wiskiw.recordmanagerapp.presentation.theme.size
 import dev.wiskiw.recordmanagerapp.presentation.tool.mvi.ConsumeSideEffect
@@ -92,17 +94,11 @@ private fun Content(
                 onRetry = { handleAction(RecordListViewModel.Action.OnRetryClick) },
             )
 
-            else -> RecordListView(
+            else -> LoadedContent(
                 modifier = Modifier.padding(scaffoldPaddings),
-                records = state.records,
-                verticalArrangement = Arrangement.spacedBy(MaterialTheme.size.one),
-                contentPadding = PaddingValues(
-                    vertical = MaterialTheme.size.three,
-                    horizontal = MaterialTheme.size.one,
-                ),
-                onClick = { id -> handleAction(RecordListViewModel.Action.OnRecordClick(id)) },
-                onEditClick = { id -> handleAction(RecordListViewModel.Action.OnEditClick(id)) },
-                onDeleteClick = { id -> handleAction(RecordListViewModel.Action.OnDeleteClick(id)) },
+                searchQuery = state.searchQuery,
+                records = state.filteredRecords,
+                handleAction = handleAction,
             )
         }
     }
@@ -146,6 +142,42 @@ private fun BottomBar(
     )
 }
 
+@Composable
+private fun LoadedContent(
+    modifier: Modifier = Modifier,
+    handleAction: (RecordListViewModel.Action) -> Unit,
+    searchQuery: String,
+    records: List<Record>,
+) {
+    Column(
+        modifier = modifier,
+    ) {
+
+        TextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(MaterialTheme.size.one),
+            label = {
+                Text(text = stringResource(id = R.string.screen_record_list_search_title))
+            },
+            value = searchQuery,
+            onValueChange = { value -> handleAction(RecordListViewModel.Action.OnSearchInput(value)) },
+        )
+
+
+        RecordListView(
+            modifier = Modifier,
+            records = records,
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.size.one),
+            contentPadding = PaddingValues(MaterialTheme.size.one),
+            onClick = { id -> handleAction(RecordListViewModel.Action.OnRecordClick(id)) },
+            onEditClick = { id -> handleAction(RecordListViewModel.Action.OnEditClick(id)) },
+            onDeleteClick = { id -> handleAction(RecordListViewModel.Action.OnDeleteClick(id)) },
+        )
+    }
+}
+
 @Preview(showBackground = true, device = Devices.PIXEL)
 @Composable
 private fun ContentPreviewLight() {
@@ -173,7 +205,8 @@ private fun ContentPreviewLight() {
     val uiState = RecordListUiState(
         isLoading = false,
         error = null,
-        records = records
+        searchQuery = "",
+        records = records,
     )
 
     RecordManagerTheme(

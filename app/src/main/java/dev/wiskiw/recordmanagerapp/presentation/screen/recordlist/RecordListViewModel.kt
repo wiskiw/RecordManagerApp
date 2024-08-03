@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dev.wiskiw.recordmanagerapp.app.logger.AppLogger
 import dev.wiskiw.recordmanagerapp.domain.usecase.RecordUseCase
-import dev.wiskiw.recordmanagerapp.domain.usecase.SearchRecordUseCase
 import dev.wiskiw.recordmanagerapp.presentation.tool.mvi.MviAction
 import dev.wiskiw.recordmanagerapp.presentation.tool.mvi.MviSideEffect
 import dev.wiskiw.recordmanagerapp.presentation.tool.mvi.MviViewModel
@@ -15,13 +14,13 @@ import kotlinx.coroutines.launch
 class RecordListViewModel(
     savedStateHandle: SavedStateHandle?,
     private val logger: AppLogger,
-    private val searchRecordUseCase: SearchRecordUseCase,
     private val recordUseCase: RecordUseCase,
 ) : MviViewModel<RecordListUiState, RecordListViewModel.Action, RecordListViewModel.SideEffect>(savedStateHandle) {
 
     sealed interface Action : MviAction {
         data object OnRetryClick : Action
         data object OnAddClick : Action
+        data class OnSearchInput(val value: String) : Action
         data class OnRecordClick(val id: String) : Action
         data class OnEditClick(val id: String) : Action
         data class OnDeleteClick(val id: String) : Action
@@ -38,6 +37,7 @@ class RecordListViewModel(
     }
 
     override fun createInitialUiState(): RecordListUiState = RecordListUiState(
+        searchQuery = "",
         records = emptyList(),
         isLoading = true,
         error = null,
@@ -47,6 +47,7 @@ class RecordListViewModel(
         when (action) {
             is Action.OnRetryClick -> fetchRecords()
             is Action.OnAddClick -> sendSideEffect(SideEffect.NavigateToCreateRecordScreen)
+            is Action.OnSearchInput -> updateState { copy(searchQuery = action.value) }
             is Action.OnRecordClick -> sendSideEffect(SideEffect.NavigateToRecord(id = action.id))
             is Action.OnEditClick -> sendSideEffect(SideEffect.NavigateToEditRecordScreen(id = action.id))
             is Action.OnDeleteClick -> deleteRecord(action.id)
@@ -63,7 +64,7 @@ class RecordListViewModel(
         }
 
         viewModelScope.launch {
-            searchRecordUseCase.getAll()
+            recordUseCase.getAll()
                 .catch {
                     updateState {
                         copy(
@@ -87,9 +88,7 @@ class RecordListViewModel(
 
     private fun deleteRecord(recordId: String) {
         viewModelScope.launch {
-            recordUseCase.delete(recordId)
-                .catch { logger.logError("Failed to delete record id:$recordId", it) }
-                .collectLatest {}
+            recordUseCase.delete(recordId).catch { logger.logError("Failed to delete record id:$recordId", it) }.collectLatest {}
         }
     }
 }

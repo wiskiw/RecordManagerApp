@@ -43,7 +43,7 @@ class MockedRecordRepository : RecordRepository {
         }
     }
 
-    override fun getAll(searchQuery: String?): Flow<List<Record>> {
+    override fun getAll(): Flow<List<Record>> {
         return flow {
             delay(1.seconds.inWholeMilliseconds)
             emit(recordList)

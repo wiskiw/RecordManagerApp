@@ -14,7 +14,7 @@ interface RecordRepository {
 
     fun get(id: String): Flow<Record>
 
-    fun getAll(searchQuery: String?): Flow<List<Record>>
+    fun getAll(): Flow<List<Record>>
 
     fun delete(id: String): Flow<Unit>
 }

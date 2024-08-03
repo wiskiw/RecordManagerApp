@@ -18,7 +18,7 @@ class RecordRelationsUseCase(
     fun getAvailableRelations(id: String): Flow<List<Record>> {
         return combine(
             recordRelationsRepository.getRelatedRecords(id),
-            recordRepository.getAll(null),
+            recordRepository.getAll(),
         ) { relatedRecords, allRecords ->
             allRecords
                 .filterNot { record -> record.id == id }

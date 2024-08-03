@@ -5,6 +5,7 @@
     <string name="screen_record_list_no_records">No available records found</string>
     <string name="screen_record_list_bottom_bar_button_add_description">Add Record Button</string>
     <string name="screen_record_list_bottom_bar_button_add_title">Add Record</string>
+    <string name="screen_record_list_search_title">Search</string>
 
     <string name="screen_record_title">Record</string>
     <string name="screen_record_top_bar_button_back_description">Back Button</string>

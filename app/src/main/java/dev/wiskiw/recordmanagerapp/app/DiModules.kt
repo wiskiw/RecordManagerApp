@@ -12,7 +12,6 @@ import dev.wiskiw.recordmanagerapp.domain.repository.RecordRelationsRepository
 import dev.wiskiw.recordmanagerapp.domain.repository.RecordRepository
 import dev.wiskiw.recordmanagerapp.domain.usecase.RecordRelationsUseCase
 import dev.wiskiw.recordmanagerapp.domain.usecase.RecordUseCase
-import dev.wiskiw.recordmanagerapp.domain.usecase.SearchRecordUseCase
 import dev.wiskiw.recordmanagerapp.presentation.screen.editrecord.EditRecordViewModel
 import dev.wiskiw.recordmanagerapp.presentation.screen.record.RecordViewModel
 import dev.wiskiw.recordmanagerapp.presentation.screen.recordlist.RecordListViewModel
@@ -22,7 +21,7 @@ import org.koin.dsl.module
 
 val viewModelModule = module {
     viewModel { RecordViewModel(get(), get(), get(), get()) }
-    viewModel { RecordListViewModel(get(), get(), get(), get()) }
+    viewModel { RecordListViewModel(get(), get(), get()) }
     viewModel { EditRecordViewModel(get(), get(), get()) }
 }
 
@@ -62,5 +61,4 @@ val appModule = module {
     // creating UseCases
     single { RecordUseCase(get()) }
     single { RecordRelationsUseCase(get(), get()) }
-    single { SearchRecordUseCase(get()) }
 }

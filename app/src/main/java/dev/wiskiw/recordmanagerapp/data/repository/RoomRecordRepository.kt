@@ -37,7 +37,7 @@ class RoomRecordRepository(
     }
 
 
-    override fun getAll(searchQuery: String?): Flow<List<Record>> {
+    override fun getAll(): Flow<List<Record>> {
         return recordEntityDao.getAll()
             .map { recordEntityList -> recordMapper.mapAllToDomain(recordEntityList) }
     }
